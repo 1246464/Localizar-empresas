@@ -1,145 +1,54 @@
-# 🔍 Localizador de Empresas
+# Localizador de empresas
 
-Sistema desktop para localizar empresas próximas usando múltiplas APIs de geolocalização.
+Aplicativo desktop em Python e PyQt5 para encontrar empresas por proximidade com OpenStreetMap, Google Places, Yelp e Foursquare.
 
-![Interface do Localizador de Empresas](screenshot.png)
+![Interface do aplicativo](screenshot.png)
 
-## 📋 Funcionalidades
+## Executar no Windows
 
-- ✅ Busca empresas por proximidade (raio configurável)
-- ✅ Suporte a **4 APIs diferentes**: Google Places, Yelp, Foursquare e OpenStreetMap
-- ✅ Detecção automática de localização via IP
-- ✅ Interface gráfica intuitiva com PyQt5
-- ✅ Exportação dos resultados para Excel
-- ✅ Busca em background (não trava a interface)
-- ✅ Validação completa de entradas
-- ✅ Tratamento robusto de erros
+Requer Python 3.10 ou superior.
 
-## 🚀 Instalação
-
-### Pré-requisitos
-
-- Python 3.7 ou superior
-- pip (gerenciador de pacotes do Python)
-
-### Passo a Passo
-
-1. **Clone ou baixe o projeto**
-
-2. **Instale as dependências**
-```bash
-pip install -r requirements.txt
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe localizador_empresas.py
 ```
 
-3. **Execute o programa**
-```bash
-python localizador_empresas.py
+## Como usar
+
+1. Escolha a fonte. O **OSM** vem selecionado e não exige chave.
+2. Para outros provedores, informe uma chave com acesso à API correspondente. A chave fica mascarada e não é salva pelo aplicativo.
+3. Escolha um segmento em português ou digite um termo compatível com o provedor.
+4. Defina o raio em metros: até 50.000 m, ou 40.000 m para Yelp.
+5. Informe latitude e longitude (ponto ou vírgula decimal) ou clique em **Usar localização por IP**. Essa ação consulta o serviço HTTPS ipwho.is. A posição é aproximada: confirme antes de buscar. Não existe localização padrão silenciosa.
+6. Clique em **Buscar empresas**. Filtre a tabela por texto e clique nos cabeçalhos para ordenar.
+7. **Exportar Excel** salva apenas as linhas visíveis, na ordem exibida, com filtros e cabeçalho congelado.
+
+## Provedores e limites
+
+- **OpenStreetMap:** consulta Overpass incluindo pontos, áreas e relações. Categorias conhecidas usam tags apropriadas (`amenity`, `shop`, `tourism`, `leisure`). Termos personalizados devem ser valores de `amenity`, como `dentist`. Não fornece avaliações. Dados © colaboradores do OpenStreetMap, ODbL.
+- **Google:** usa Places API (New), Nearby Search, com até 20 resultados por consulta. Ative essa API na conta. Campos de avaliações podem afetar a cobrança. [Documentação oficial](https://developers.google.com/maps/documentation/places/web-service/nearby-search).
+- **Yelp:** busca até 50 resultados por consulta, com endereço completo quando disponível.
+- **Foursquare:** usa Places API atual com token Bearer e versão `2025-06-17`, até 50 resultados. [Documentação oficial](https://docs.foursquare.com/fsq-developers-places/reference/place-search).
+
+Os resultados não constituem uma listagem exaustiva de empresas. Cobertura, disponibilidade, limites e cobrança dependem do provedor e da conta. Consulte os termos de cada fonte antes de reutilizar os dados.
+
+## Melhorias desta versão
+
+- Layout redimensionável, painel de busca, estados vazios e indicador de atividade.
+- Localização, pesquisa e exportação em segundo plano.
+- Coordenadas editáveis e validação de intervalos e valores não finitos.
+- Categorias em português e OSM disponível sem configuração inicial.
+- Ordenação numérica, tabela sem edição acidental e filtro textual.
+- Resultados anteriores preservados quando uma nova consulta falha.
+- Chaves não incluídas nas mensagens de erro e textos externos exportados como texto, nunca como fórmulas.
+- Fechamento impedido durante uma operação para evitar destruir uma thread ativa. As requisições possuem timeout.
+- Serviços separados da interface e remoção da dependência de pandas.
+
+## Testes
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest -v
 ```
 
-## 🔑 Configuração de APIs
-
-O programa suporta 4 APIs. Você precisará de chaves (API Keys) para usar a maioria delas:
-
-### 1. Google Places API
-- **Precisa de API Key**: ✅ Sim
-- **Como obter**: https://developers.google.com/maps/documentation/places/web-service/get-api-key
-- **Custo**: Tem plano gratuito com limite de requisições
-- **Melhor para**: Dados completos e precisos, com avaliações
-
-### 2. Yelp API
-- **Precisa de API Key**: ✅ Sim
-- **Como obter**: https://www.yelp.com/developers/v3/manage_app
-- **Custo**: Gratuito (com limites)
-- **Melhor para**: Restaurantes, bares, serviços locais
-
-### 3. Foursquare API
-- **Precisa de API Key**: ✅ Sim
-- **Como obter**: https://foursquare.com/developers/apps
-- **Custo**: Tem plano gratuito
-- **Melhor para**: Locais turísticos, pontos de interesse
-
-### 4. OpenStreetMap (OSM)
-- **Precisa de API Key**: ❌ Não (totalmente gratuito!)
-- **Limitação**: Menos dados detalhados
-- **Melhor para**: Teste rápido sem precisar de API Key
-
-## 📖 Como Usar
-
-1. **Escolha a API** no menu dropdown (Google, Yelp, Foursquare ou OSM)
-
-2. **Insira a API Key** (exceto para OSM)
-
-3. **Defina o segmento** que deseja buscar:
-   - Google: `restaurant`, `cafe`, `gym`, `hotel`, `bank`
-   - Yelp: `pizza`, `sushi`, `coffee`, `bar`
-   - Foursquare: `restaurant`, `bar`, `hotel`, `museum`
-   - OSM: `restaurant`, `cafe`, `hospital`, `school`
-
-4. **Defina o raio** em metros (padrão: 5000 = 5km, máximo: 50km)
-
-5. **Clique em PROCURAR** e aguarde os resultados
-
-6. **Exporte para Excel** se desejar salvar os dados
-
-## 📊 Colunas Exportadas
-
-- **Nome**: Nome da empresa
-- **Endereço**: Endereço completo ou aproximado
-- **Avaliação**: Nota/rating (quando disponível)
-- **Reviews**: Número de avaliações
-- **Latitude**: Coordenada geográfica
-- **Longitude**: Coordenada geográfica
-
-## 🎨 Interface
-
-A interface possui:
-- Design moderno com cores suaves
-- Feedback visual de todas as operações
-- Contador de resultados encontrados
-- Indicador de carregamento durante buscas
-- Mensagens de erro claras e descritivas
-
-## ⚠️ Problemas Comuns
-
-### "API Key inválida"
-- Verifique se copiou a chave completa
-- Confirme que a API está ativada no console do provedor
-- Aguarde alguns minutos após criar a chave
-
-### "Nenhuma empresa encontrada"
-- Tente aumentar o raio de busca
-- Verifique se o segmento está correto
-- Use termos em inglês para melhores resultados
-
-### "Erro de conexão"
-- Verifique sua conexão com a internet
-- Alguns firewalls podem bloquear as requisições
-- Tente usar o OSM (não precisa de API Key)
-
-## 🛠️ Tecnologias Utilizadas
-
-- **Python 3.x**
-- **PyQt5**: Interface gráfica
-- **Pandas**: Manipulação e exportação de dados
-- **Requests**: Requisições HTTP para APIs
-- **OpenPyXL**: Geração de arquivos Excel
-
-## 📝 Licença
-
-Este projeto é de uso livre para fins educacionais e comerciais.
-
-## 👨‍💻 Contribuições
-
-Sugestões e melhorias são bem-vindas!
-
-## 📞 Suporte
-
-Se encontrar problemas:
-1. Verifique se instalou todas as dependências
-2. Confirme que suas API Keys estão corretas
-3. Teste primeiro com OSM (não precisa de chave)
-4. Leia as mensagens de erro com atenção
-
----
-
-**Desenvolvido com ❤️ usando Python e PyQt5**
+Os testes usam respostas simuladas: não consomem cota e não validam credenciais reais. Validam normalização, coordenadas, limites, erros, exportação e comportamento da interface.
